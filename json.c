@@ -225,7 +225,12 @@ readstring( ifile *f )
 
         } else if( hex ) {
             if( isxdigit( c )) {
-                x = 16 * x + c;
+	        if( isdigit( c ))
+		    x = 16 * x + c - '0';
+		else if( isupper( c ))
+		    x = 16 * x + c - 'A' + 10;
+		else
+		    x = 16 * x + c - 'a' + 10;
                 if( !--hex )
                     twaddu( &tw, x );
             } else {
