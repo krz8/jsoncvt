@@ -1,7 +1,7 @@
 Lightweight JSON Parsing in C
 =============================
 Bob Krzaczek <krz@cis.rit.edu>
-v1.0.4, 2014-Aug-01: Rob Reay keeps me honest.
+v1.0.5, 2014-Aug-11: Rob Reay keeps me honest.
 :toc:
 :icons:
 :encoding: utf-8
@@ -10,22 +10,22 @@ v1.0.4, 2014-Aug-01: Rob Reay keeps me honest.
 
 == What ==
 
+=== A Very Lightweight JSON Parser ===
+
 *json.h* defines a simple interface and parse tree in simple C that
 can be used to represent data received in JSON format.
 
 *json.c* is a lightweight implementation of that interface.
 
+=== A JSON Parser for the Korn shell ===
+
 *jsoncvt* is a program built on that parser that can convert JSON into
-Korn shell expressions. It also supports XML, in the event you have an
-XML parser but no JSON parser available in your environment.
+Korn shell expressions. It also supports output in XML, in the event
+you have an XML parser but no JSON parser available in your
+environment.
 
-== Who ==
-
-People who need a _very_ lightweight but complete JSON parser in
-standard C.
-
-People who need to read JSON data in Korn shell programs, but don't
-want to mess with builtins and the like.
+Primarily, this is for people who need to read JSON in ksh93, but
+don't want to mess with builtins and the like.
 
 == Why ==
 
@@ -43,7 +43,7 @@ NOTE: Later, I learned I had overlooked
 https://github.com/udp/json-parser[json-parser], which is very similar
 in spirit to this one. If I had looked closer and evaluated every C
 implementation out there, I might have found and selected this one
-instead.
+instead of writing my own.
 
 I needed a JSON parser because I wanted to work with JSON data in some
 Korn shell programming, which is how *jsoncvt* came to be. As recent
@@ -166,7 +166,7 @@ For example, the following minimum program, in which we're
 unprofessionally skipping all error checks and other reasonable
 behavior, is all that's needed to parse and manipulate a JSON tree.
 
-----------------------------------------------
+------------------------------------------------------
 #include <stdio.h>
 #include <string.h>
 #include "json.h"
@@ -175,16 +175,23 @@ int
 main()
 {
     FILE *fp = fopen( "krz.json", "r" );
-    jvalue *krz = jparse( fp );
+    jvalue *krz = jparse( fp );                    <1>
     fclose( fp );
 
     for( jvalue **j = krz->u.v; *j; ++j )
-        if( !strcmp( (*j)->n, "email" ))
+        if( !strcmp( (*j)->n, "email" ))           <2>
             printf( "address: %s\n", (*j)->u.s );
 
     return 0;
 }
-----------------------------------------------
+------------------------------------------------------
+
+<1> That's all there is to it; at the heart of things, it's a
+    single function call.
+<2> If you need to parse huge JSON objects, I could easily add
+    some kind of hash to the jvalue, rather than relying on
+    silliness like strcmp(3). On the other hand, it's simple,
+    demonstrative, and often fast enough.
 
 Each node in the tree is described by a discriminator member *d* which
 takes on one of these values: *jnull*, *jtrue*, *jfalse*, *jstring*,
@@ -197,7 +204,7 @@ usage, I'm converting values and don't want the usual imprecision of
 converting from decimal strings to internal representations and then
 back to decimal strings.
 
-If your program will work with the data, and you want the numberic
+If your program will work with the data, and you want the numeric
 values as native integers and reals, call *jupdate()* on the parse
 tree, and all *jnumber* nodes will be converted to *jinteger* or
 *jreal*, activating other parts of the jvalue union accordingly.
@@ -241,9 +248,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 While the code presented in *sanity.h* and *sanity.c* is original, it
 is certainly inspired by the excellent book, "The Practice of
 Programming" by Brian W. Kernighan and Rob Pike. Quoting from that
-book:
+source:
 
-[quote,'http://cm.bell-labs.com/cm/cs/tpop/code.html[The Practice Of Programming]']
+[quote,'http://cm.bell-labs.com/cm/cs/tpop/[The Practice Of Programming]']
 _____________________________________________________________________
 You may use this code for any purpose, as long as you leave the
 copyright notice and book citation attached. Copyright © 1999 Lucent

@@ -29,6 +29,11 @@ fi
 version=${version#v}
 print "releasing version $version"
 
+if	! grep "//DTD jsoncvt $version//" xml.c >/dev/null 2>&1
+then	print "xml.c DTD version is out of date"
+	exit 1
+fi
+
 if	[[ $version != "$(git tag -l "$version")" ]]
 then	print "is $version tagged?"
 	exit 1

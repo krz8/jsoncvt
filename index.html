@@ -736,8 +736,8 @@ asciidoc.install(2);
 <h1>Lightweight JSON Parsing in C</h1>
 <span id="author">Bob Krzaczek</span><br />
 <span id="email"><code>&lt;<a href="mailto:krz@cis.rit.edu">krz@cis.rit.edu</a>&gt;</code></span><br />
-<span id="revnumber">version 1.0.4,</span>
-<span id="revdate">2014-Aug-01</span>
+<span id="revnumber">version 1.0.5,</span>
+<span id="revdate">2014-Aug-11</span>
 <br /><span id="revremark">Rob Reay keeps me honest.</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
@@ -748,21 +748,21 @@ asciidoc.install(2);
 <div class="sect1">
 <h2 id="_what">What</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_a_very_lightweight_json_parser">A Very Lightweight JSON Parser</h3>
 <div class="paragraph"><p><strong>json.h</strong> defines a simple interface and parse tree in simple C that
 can be used to represent data received in JSON format.</p></div>
 <div class="paragraph"><p><strong>json.c</strong> is a lightweight implementation of that interface.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_a_json_parser_for_the_korn_shell">A JSON Parser for the Korn shell</h3>
 <div class="paragraph"><p><strong>jsoncvt</strong> is a program built on that parser that can convert JSON into
-Korn shell expressions. It also supports XML, in the event you have an
-XML parser but no JSON parser available in your environment.</p></div>
+Korn shell expressions. It also supports output in XML, in the event
+you have an XML parser but no JSON parser available in your
+environment.</p></div>
+<div class="paragraph"><p>Primarily, this is for people who need to read JSON in ksh93, but
+don&#8217;t want to mess with builtins and the like.</p></div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_who">Who</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>People who need a <em>very</em> lightweight but complete JSON parser in
-standard C.</p></div>
-<div class="paragraph"><p>People who need to read JSON data in Korn shell programs, but don&#8217;t
-want to mess with builtins and the like.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -829,7 +829,7 @@ PAr9L8j/96+U/w3yCoCXW14B8HLLvwDd67nwZIEPdgAAAABJRU5ErkJggg==" />
 <a href="https://github.com/udp/json-parser">json-parser</a>, which is very similar
 in spirit to this one. If I had looked closer and evaluated every C
 implementation out there, I might have found and selected this one
-instead.</td>
+instead of writing my own.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p>I needed a JSON parser because I wanted to work with JSON data in some
@@ -1008,16 +1008,52 @@ int
 main()
 {
     FILE *fp = fopen( "krz.json", "r" );
-    jvalue *krz = jparse( fp );
+    jvalue *krz = jparse( fp );                    <img alt="1" src="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAAAAABzHgM7AAAAAmJLR0QAAKqNIzIAAABjSURBVHja
+VY6xDcAwCAS/pPQaLim9QmajdOk2I2SNrMEIlARIoigU8Cek/4e7zdHaWOYOVwaoA6wOCw05Y7FB
+gE0tIWQ+sBcwKM8qoD/wB5wGL8hjfdzWrh01GRp1hInGjDoXwHgsFuzBVLQAAABDdEVYdFNvZnR3
+YXJlAEAoIylJbWFnZU1hZ2ljayA0LjIuOCA5OS8wOC8wMSBjcmlzdHlAbXlzdGljLmVzLmR1cG9u
+dC5jb22RuiG4AAAAKnRFWHRTaWduYXR1cmUANThhMDcyZTA3MGRhMjJmNjEzNWNiZDNlNDE0NTQ2
+ZjloaiHtAAAADnRFWHRQYWdlADEyeDEyKzArMIRtu30AAAAASUVORK5CYII=" />
     fclose( fp );
 
     for( jvalue **j = krz-&gt;u.v; *j; ++j )
-        if( !strcmp( (*j)-&gt;n, "email" ))
+        if( !strcmp( (*j)-&gt;n, "email" ))           <img alt="2" src="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAAAAABzHgM7AAAAAmJLR0QAAKqNIzIAAAB7SURBVHja
+HY6hFcMwDEQ/NDQsNSwU9Apdo7Cw0CsIBoZmhKzQEQJLDQsFVclHpHu693W429Zr7bu541Pg3kCm
+Y0K75u9TEUPhuGgWU4mQDvieEaSQEnsT6zKPeZY0EUNtrHMCXvYUuSUg0PsMjUSvpysUT6OOSil9
+izp/VNk1YJ8vf6MAAABDdEVYdFNvZnR3YXJlAEAoIylJbWFnZU1hZ2ljayA0LjIuOCA5OS8wOC8w
+MSBjcmlzdHlAbXlzdGljLmVzLmR1cG9udC5jb22RuiG4AAAAKnRFWHRTaWduYXR1cmUAODBlYWU1
+MjljOTRhN2Y0N2RlY2NmYWRhMjhhY2I5ZGblb7ENAAAADnRFWHRQYWdlADEyeDEyKzArMIRtu30A
+AAAASUVORK5CYII=" />
             printf( "address: %s\n", (*j)-&gt;u.s );
 
     return 0;
 }</code></pre>
 </div></div>
+<div class="colist arabic"><table>
+<tr><td><img alt="1" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAAAAABzHgM7AAAAAmJLR0QAAKqNIzIAAABjSURBVHja
+VY6xDcAwCAS/pPQaLim9QmajdOk2I2SNrMEIlARIoigU8Cek/4e7zdHaWOYOVwaoA6wOCw05Y7FB
+gE0tIWQ+sBcwKM8qoD/wB5wGL8hjfdzWrh01GRp1hInGjDoXwHgsFuzBVLQAAABDdEVYdFNvZnR3
+YXJlAEAoIylJbWFnZU1hZ2ljayA0LjIuOCA5OS8wOC8wMSBjcmlzdHlAbXlzdGljLmVzLmR1cG9u
+dC5jb22RuiG4AAAAKnRFWHRTaWduYXR1cmUANThhMDcyZTA3MGRhMjJmNjEzNWNiZDNlNDE0NTQ2
+ZjloaiHtAAAADnRFWHRQYWdlADEyeDEyKzArMIRtu30AAAAASUVORK5CYII=" /></td><td>
+That&#8217;s all there is to it; at the heart of things, it&#8217;s a
+    single function call.
+</td></tr>
+<tr><td><img alt="2" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAAAAABzHgM7AAAAAmJLR0QAAKqNIzIAAAB7SURBVHja
+HY6hFcMwDEQ/NDQsNSwU9Apdo7Cw0CsIBoZmhKzQEQJLDQsFVclHpHu693W429Zr7bu541Pg3kCm
+Y0K75u9TEUPhuGgWU4mQDvieEaSQEnsT6zKPeZY0EUNtrHMCXvYUuSUg0PsMjUSvpysUT6OOSil9
+izp/VNk1YJ8vf6MAAABDdEVYdFNvZnR3YXJlAEAoIylJbWFnZU1hZ2ljayA0LjIuOCA5OS8wOC8w
+MSBjcmlzdHlAbXlzdGljLmVzLmR1cG9udC5jb22RuiG4AAAAKnRFWHRTaWduYXR1cmUAODBlYWU1
+MjljOTRhN2Y0N2RlY2NmYWRhMjhhY2I5ZGblb7ENAAAADnRFWHRQYWdlADEyeDEyKzArMIRtu30A
+AAAASUVORK5CYII=" /></td><td>
+If you need to parse huge JSON objects, I could easily add
+    some kind of hash to the jvalue, rather than relying on
+    silliness like strcmp(3). On the other hand, it&#8217;s simple,
+    demonstrative, and often fast enough.
+</td></tr>
+</table></div>
 <div class="paragraph"><p>Each node in the tree is described by a discriminator member <strong>d</strong> which
 takes on one of these values: <strong>jnull</strong>, <strong>jtrue</strong>, <strong>jfalse</strong>, <strong>jstring</strong>,
 <strong>jnumber</strong>, <strong>jarray</strong>, and <strong>jobject</strong>.</p></div>
@@ -1075,7 +1111,7 @@ PAr9L8j/96+U/w3yCoCXW14B8HLLvwDd67nwZIEPdgAAAABJRU5ErkJggg==" />
 usage, I&#8217;m converting values and don&#8217;t want the usual imprecision of
 converting from decimal strings to internal representations and then
 back to decimal strings.</p></div>
-<div class="paragraph"><p>If your program will work with the data, and you want the numberic
+<div class="paragraph"><p>If your program will work with the data, and you want the numeric
 values as native integers and reals, call <strong>jupdate()</strong> on the parse
 tree, and all <strong>jnumber</strong> nodes will be converted to <strong>jinteger</strong> or
 <strong>jreal</strong>, activating other parts of the jvalue union accordingly.</p></div>
@@ -1122,7 +1158,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></div>
 <div class="paragraph"><p>While the code presented in <strong>sanity.h</strong> and <strong>sanity.c</strong> is original, it
 is certainly inspired by the excellent book, "The Practice of
 Programming" by Brian W. Kernighan and Rob Pike. Quoting from that
-book:</p></div>
+source:</p></div>
 <div class="quoteblock">
 <div class="content">
 <div class="paragraph"><p>You may use this code for any purpose, as long as you leave the
@@ -1130,14 +1166,14 @@ copyright notice and book citation attached. Copyright © 1999 Lucent
 Technologies. All rights reserved. Mon Mar 19 13:59:27 EST 2001</p></div>
 </div>
 <div class="attribution">
-&#8212; <a href="http://cm.bell-labs.com/cm/cs/tpop/code.html">The Practice Of Programming</a>
+&#8212; <a href="http://cm.bell-labs.com/cm/cs/tpop/">The Practice Of Programming</a>
 </div></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_where">Where</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><a href="jsoncvt-1.0.4.tar.xz">jsoncvt-1.0.4.tar.xz</a></p></div>
+<div class="paragraph"><p><a href="jsoncvt-1.0.5.tar.xz">jsoncvt-1.0.5.tar.xz</a></p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1156,8 +1192,8 @@ like I need a hole in my head.</pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 1.0.4<br />
-Last updated 2014-08-02 12:50:08 EDT
+Version 1.0.5<br />
+Last updated 2014-09-16 14:22:57 EDT
 </div>
 </div>
 </body>
