@@ -1,0 +1,256 @@
+Lightweight JSON Parsing in C
+=============================
+Bob Krzaczek <krz@cis.rit.edu>
+v1.0, 2014-Jul-13: First Release
+:toc:
+:icons:
+:encoding: utf-8
+:lang: en
+:data-uri:
+
+== What ==
+
+*json.h* defines a simple interface and parse tree in simple C that
+can be used to represent data received in JSON format.
+
+*json.c* is a lightweight implementation of that interface.
+
+*jsoncvt* is a program built on that parser that can convert JSON into
+Korn shell expressions. It also supports XML, in the event you have an
+XML parser but no JSON parser available in your environment.
+
+== Who ==
+
+People who need a _very_ lightweight but complete JSON parser in
+standard C.
+
+People who need to read JSON data in Korn shell programs, but don't
+want to mess with builtins and the like.
+
+== Why ==
+
+The parser exists because, as I looked through some of the existing
+parsers advertised for C at http://json.org/ I was surprised at how
+large some of them were. JSON is an intentionally small and simple
+format; a parser for it should be equally small and simple.
+
+The entire specification for the parser is just 32 lines of code, and
+its implementation comes in at under 500 lines of code. This is
+strictly written to C99 and POSIX.1-2001; it should compile nearly
+anywhere that's reasonable.
+
+NOTE: Later, I learned I had overlooked
+https://github.com/udp/json-parser[json-parser], which is very similar
+in spirit to this one. If I had looked closer and evaluated every C
+implementation out there, I might have found and selected this one
+instead.
+
+I needed a JSON parser because I wanted to work with JSON data in some
+Korn shell programming, which is how *jsoncvt* came to be. As recent
+versions of ksh93 (neé ksh) are pretty rich in their supported types
+(compound variables, booleans and integers and reals (oh my), and
+arrays of those types), I wanted something that would yield _native_
+and _rich_ structures in ksh93.
+
+== How ==
+
+=== Source Overview ===
+
+The sources to *jsoncvt* are written assuming only C99 and
+POSIX.1-2001. They should compile just about anywhere reasonable
+without modification.
+
+*json.h, json.c*::
+    The heart of the software, a fast and lightweight JSON parser.
+*ksh.h, ksh.c*::
+    Emits a parsed JSON tree in ksh93 syntax.
+*xml.h, xml.c*::
+    Emits a parsed JSON tree in XML syntax. A DTD describing the
+    emitted XML is available link:jsoncvt.dtd[here].
+*twine.h, twine.c*::
+    A set of functions for building simple C strings.
+*ptrvec.h, ptrvec.c*::
+    A set of functions for building vectors of pointers.
+*sanity.h, sanity.c*::
+    Functions that help maintain my sanity.
+
+=== Building ===
+
+Primarily, *json.h* and *json.c* are the files of interest. You
+wouldn't install those; instead, you can just include them into your
+own project. The parser is small enough to fit in just those files for
+exactly that reason. As provided, they use *ptrvec* and *twine* which
+shouldn't conflict with anything your project, but feel free to rename
+them as necessary. Porting to use your own replacements for *ptrvec*,
+*sanity*, and *twine* should be a piece of cake; there is nothing
+elaborate in there.
+
+But *jsoncvt* is a useful utility, and you might want to make that
+generally available on your system. Easy peasy:
+
+1. Use *make* to build. Supply CFLAGS and maybe even CC if you need
+   to, but straight out the box, it should be okay. There's no need for
+   autoconf, iffe, or anything like that. Standards are good that way.
+2. Place the resulting *jsoncvt* into a *.../bin* directory of your
+   choice.
+3. Place *jsoncvt.1* into a *.../man/man1* directory of your choice.
+
+=== Using jsoncvt ===
+
+*jsoncvt* operates as a filter. For example, let's say you had this
+JSON stream:
+
+------------------------------------------
+{
+    "first" : "Bob",
+    "last" : "Krzaczek",
+    "email" : "Robert.Krzaczek@gmail.com",
+    "lucky" : 13,
+    "quarter" : 0.25,
+    "empty" : null,
+    "nerd" : true,
+    "lotto" : [ 9, 12, 17, 38, 45, 46 ]
+}
+------------------------------------------
+
+Running *jsoncvt -k <krz.json* would yield
+
+------------------------------------
+compound foobar=(
+  first=$'Bob'
+  last=$'Krzaczek'
+  email=$'Robert.Krzaczek@gmail.com'
+  integer lucky=13
+  float quarter=0.25
+  empty=
+  bool nerd=true
+  integer -a lotto=(
+    9
+    12
+    17
+    38
+    45
+    46
+  )
+)
+------------------------------------
+
+So, in your ksh program, you could do things like the following. Note
+that the name of the variable defined by *jsoncvt* is *foo*,
+optionally named right there on the command line.
+
+---------------------------------------
+$ eval "$(jsoncvt -k foo <krz.json)"
+
+$ print "${foo.email}"
+Robert.Krzaczek@gmail.com
+
+$ print "${foo.lotto[*]}"
+9 12 17 38 45 46
+---------------------------------------
+
+=== Using the Parser ===
+
+Open a stdio file stream to read the JSON data that needs to be
+parsed, and supply it to *jparse()*. Either a pointer to a JSON value
+is returned (which recursively represents the parse tree), or NULL is
+returned when something horrible happens during parsing.
+
+For example, the following minimum program, in which we're
+unprofessionally skipping all error checks and other reasonable
+behavior, is all that's needed to parse and manipulate a JSON tree.
+
+----------------------------------------------
+#include <stdio.h>
+#include <string.h>
+#include "json.h"
+
+int
+main()
+{
+    FILE *fp = fopen( "krz.json", "r" );
+    jvalue *krz = jparse( fp );
+    fclose( fp );
+
+    for( jvalue **j = krz->u.v; *j; ++j )
+        if( !strcmp( j->n, "email" ))
+            printf( "address: %s\n", j->u.s );
+
+    return 0;
+}
+----------------------------------------------
+
+Each node in the tree is described by a discriminator member *d* which
+takes on one of these values: *jnull*, *jtrue*, *jfalse*, *jstring*,
+*jnumber*, *jarray*, and *jobject*.
+
+[NOTE]
+====================================================================
+The returned tree leaves numeric values as strings, because in my
+usage, I'm converting values and don't want the usual imprecision of
+converting from decimal strings to internal representations and then
+back to decimal strings.
+
+If your program will work with the data, and you want the numberic
+values as native integers and reals, call *jupdate()* on the parse
+tree, and all *jnumber* nodes will be converted to *jinteger* or
+*jreal*, activating other parts of the jvalue union accordingly.
+
+You can safely combine these calls, if you like. In the previous
+example, you might make these changes:
+
+-------------------------------------------
+jvalue *krz = jupdate( jparse( fp ));
+...
+    else if( !strcmp( j->n, "quarter" ))
+        printf( "quarter: %Lf\n", j->u.r );
+-------------------------------------------
+====================================================================
+
+== License ==
+
+Copyright ⓒ 2014 Robert S. Krzaczek.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+“Software”), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT HOLDER BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+== Other Copyrights ==
+
+While the code presented in *sanity.h* and *sanity.c* is original, it
+is certainly inspired by the excellent book, "The Practice of
+Programming" by Brian W. Kernighan and Rob Pike. Quoting from that
+book:
+
+[quote,'http://cm.bell-labs.com/cm/cs/tpop/code.html[The Practice Of Programming]']
+_____________________________________________________________________
+You may use this code for any purpose, as long as you leave the
+copyright notice and book citation attached. Copyright © 1999 Lucent
+Technologies. All rights reserved. Mon Mar 19 13:59:27 EST 2001
+_____________________________________________________________________
+
+== Where ==
+
+link:jsoncvt-1.0.tar.xz[]
+
+== Miscellaneous ==
+
+[verse, with apologies to Cracker]
+'Cause what the world needs now
+is another JSON parser
+like I need a hole in my head.
