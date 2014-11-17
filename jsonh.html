@@ -742,94 +742,7 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="paragraph"><p><a href="index.html">Back</a> to the main page.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="color: #000000">    1:</span> <span style="font-style: italic"><span style="color: #9A1900">/* See one of the index files for license and other details. */</span></span>
-<span style="color: #000000">    2:</span> <span style="font-weight: bold"><span style="color: #000080">#ifndef</span></span> jsoncvt_json_h
-<span style="color: #000000">    3:</span> <span style="font-weight: bold"><span style="color: #000080">#define</span></span> jsoncvt_json_h
-<span style="color: #000000">    4:</span> <span style="font-weight: bold"><span style="color: #000080">#pragma</span></span> once
-<span style="color: #000000">    5:</span> <span style="font-weight: bold"><span style="color: #000080">#include</span></span> <span style="color: #FF0000">&lt;stdio.h&gt;</span>
-<span style="color: #000000">    6:</span>
-<span style="color: #000000">    7:</span> <span style="font-style: italic"><span style="color: #9A1900">/** The different types of values in our JSON parser. Unlike the</span></span>
-<span style="color: #000000">    8:</span> <span style="font-style: italic"><span style="color: #9A1900"> *  standard, we discriminate between integer and real values. */</span></span>
-<span style="color: #000000">    9:</span> <span style="font-weight: bold"><span style="color: #0000FF">enum</span></span> jtypes <span style="color: #FF0000">{</span>
-<span style="color: #000000">   10:</span>     jnull<span style="color: #990000">,</span>      <span style="font-style: italic"><span style="color: #9A1900">/**&lt; The JSON "null" value. */</span></span>
-<span style="color: #000000">   11:</span>     jtrue<span style="color: #990000">,</span>      <span style="font-style: italic"><span style="color: #9A1900">/**&lt; Just a simple "true" value. */</span></span>
-<span style="color: #000000">   12:</span>     jfalse<span style="color: #990000">,</span>     <span style="font-style: italic"><span style="color: #9A1900">/**&lt; just a simple "false" value. */</span></span>
-<span style="color: #000000">   13:</span>     jstring<span style="color: #990000">,</span>    <span style="font-style: italic"><span style="color: #9A1900">/**&lt; Just your run of the mill string. */</span></span>
-<span style="color: #000000">   14:</span>     jnumber<span style="color: #990000">,</span>    <span style="font-style: italic"><span style="color: #9A1900">/**&lt; A JSON number (still just a string). */</span></span>
-<span style="color: #000000">   15:</span>     jarray<span style="color: #990000">,</span>     <span style="font-style: italic"><span style="color: #9A1900">/**&lt; A vector of values. */</span></span>
-<span style="color: #000000">   16:</span>     jobject<span style="color: #990000">,</span>    <span style="font-style: italic"><span style="color: #9A1900">/**&lt; An assoc. array of names and arbitrary values. */</span></span>
-<span style="color: #000000">   17:</span>     jint<span style="color: #990000">,</span>       <span style="font-style: italic"><span style="color: #9A1900">/**&lt; A JSON number parsed into a native integer. */</span></span>
-<span style="color: #000000">   18:</span>     jreal<span style="color: #990000">,</span>      <span style="font-style: italic"><span style="color: #9A1900">/**&lt; A JSON number parsed into a long double. */</span></span>
-<span style="color: #000000">   19:</span> <span style="color: #FF0000">}</span><span style="color: #990000">;</span>
-<span style="color: #000000">   20:</span>
-<span style="color: #000000">   21:</span> <span style="font-style: italic"><span style="color: #9A1900">/** A jvalue represents the different values found in a parse of a</span></span>
-<span style="color: #000000">   22:</span> <span style="font-style: italic"><span style="color: #9A1900"> *  JSON doc. A value can be terminal, like a string or a number, or</span></span>
-<span style="color: #000000">   23:</span> <span style="font-style: italic"><span style="color: #9A1900"> *  it can nest, as with arrays and objects. The value of #d reflects</span></span>
-<span style="color: #000000">   24:</span> <span style="font-style: italic"><span style="color: #9A1900"> *  which part of the union is value. */</span></span>
-<span style="color: #000000">   25:</span> <span style="font-weight: bold"><span style="color: #0000FF">typedef</span></span> <span style="font-weight: bold"><span style="color: #0000FF">struct</span></span> <span style="color: #008080">jvalue</span> <span style="color: #FF0000">{</span>
-<span style="color: #000000">   26:</span>
-<span style="color: #000000">   27:</span>     <span style="font-style: italic"><span style="color: #9A1900">/** Just your basic discriminator, describing which part of the</span></span>
-<span style="color: #000000">   28:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  union below is active. When this is jtrue, jfalse, or jnull,</span></span>
-<span style="color: #000000">   29:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  nothing in #u is valid (being unnecessary); all other values</span></span>
-<span style="color: #000000">   30:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  correspond to one of the #u members as described below. */</span></span>
-<span style="color: #000000">   31:</span>     <span style="font-weight: bold"><span style="color: #0000FF">enum</span></span> <span style="color: #008080">jtypes</span> d<span style="color: #990000">;</span>
-<span style="color: #000000">   32:</span>
-<span style="color: #000000">   33:</span>     <span style="font-style: italic"><span style="color: #9A1900">/** Some values have a name associated with them; in a JSON</span></span>
-<span style="color: #000000">   34:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  object, for example, the value is assigned to a specific name.</span></span>
-<span style="color: #000000">   35:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  When #d is jobject, this string should point to the name of a</span></span>
-<span style="color: #000000">   36:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  member (whose value is in #u). For other values of #d, this</span></span>
-<span style="color: #000000">   37:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  member should be null. A previous implementation used a</span></span>
-<span style="color: #000000">   38:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  separate structure for these pairings, but placing the name</span></span>
-<span style="color: #000000">   39:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  inside each value only costs an extra 4 or 8 bytes yet</span></span>
-<span style="color: #000000">   40:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  simplifies the tree quite a bit for our client. */</span></span>
-<span style="color: #000000">   41:</span>     <span style="color: #009900">char</span> <span style="color: #990000">*</span>n<span style="color: #990000">;</span>
-<span style="color: #000000">   42:</span>
-<span style="color: #000000">   43:</span>     <span style="font-style: italic"><span style="color: #9A1900">/** According to #d above, one or none of these are the active value. */</span></span>
-<span style="color: #000000">   44:</span>     <span style="font-weight: bold"><span style="color: #0000FF">union</span></span> <span style="color: #FF0000">{</span>
-<span style="color: #000000">   45:</span>         <span style="font-style: italic"><span style="color: #9A1900">/** When #d is jstring or jnumber, this string is active in</span></span>
-<span style="color: #000000">   46:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  the union. While obvious for jstring, why would this be</span></span>
-<span style="color: #000000">   47:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  used for jnumber? Because, often, there's no need to parse</span></span>
-<span style="color: #000000">   48:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  the number value into something native. While integers are</span></span>
-<span style="color: #000000">   49:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  exact, there's often an unavoidable loss of preceision</span></span>
-<span style="color: #000000">   50:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  when converting real numbers. So, we defer it as long as</span></span>
-<span style="color: #000000">   51:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  we can. If the client application actually *wants* a</span></span>
-<span style="color: #000000">   52:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  parsed value, it can convert the string to a native value,</span></span>
-<span style="color: #000000">   53:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  cache it away in the #i or #r members, and change the</span></span>
-<span style="color: #000000">   54:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  discriminator to jint or jreal accordingly. This avoids</span></span>
-<span style="color: #000000">   55:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  unnecessary parsing work and loss of precision, but</span></span>
-<span style="color: #000000">   56:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  doesn't make it unduly hard for a client to deal with. See</span></span>
-<span style="color: #000000">   57:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  jupdate() as a function the client can call to do just</span></span>
-<span style="color: #000000">   58:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  that. */</span></span>
-<span style="color: #000000">   59:</span>         <span style="color: #009900">char</span> <span style="color: #990000">*</span>s<span style="color: #990000">;</span>
-<span style="color: #000000">   60:</span>
-<span style="color: #000000">   61:</span>         <span style="font-style: italic"><span style="color: #9A1900">/** When the discriminator is jint, this integer is active. */</span></span>
-<span style="color: #000000">   62:</span>         <span style="color: #009900">long</span> <span style="color: #009900">long</span> i<span style="color: #990000">;</span>
-<span style="color: #000000">   63:</span>
-<span style="color: #000000">   64:</span>         <span style="font-style: italic"><span style="color: #9A1900">/** When the discriminator is jreal, this long double is</span></span>
-<span style="color: #000000">   65:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  active. */</span></span>
-<span style="color: #000000">   66:</span>         <span style="color: #009900">long</span> <span style="color: #009900">double</span> r<span style="color: #990000">;</span>
-<span style="color: #000000">   67:</span>
-<span style="color: #000000">   68:</span>         <span style="font-style: italic"><span style="color: #9A1900">/** When the discriminator is jarray or jobject, this</span></span>
-<span style="color: #000000">   69:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  zero-terminated vector of pointers to jvalue is active.</span></span>
-<span style="color: #000000">   70:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  You'll find the ptrvec routines make building these</span></span>
-<span style="color: #000000">   71:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  easy. */</span></span>
-<span style="color: #000000">   72:</span>         <span style="font-weight: bold"><span style="color: #0000FF">struct</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">**</span>v<span style="color: #990000">;</span>
-<span style="color: #000000">   73:</span>     <span style="color: #FF0000">}</span> u<span style="color: #990000">;</span>
-<span style="color: #000000">   74:</span> <span style="color: #FF0000">}</span> jvalue<span style="color: #990000">;</span>
-<span style="color: #000000">   75:</span>
-<span style="color: #000000">   76:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span><span style="font-weight: bold"><span style="color: #000000">jnew</span></span><span style="color: #990000">();</span>
-<span style="color: #000000">   77:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span><span style="font-weight: bold"><span style="color: #000000">jclear</span></span><span style="color: #990000">(</span> jvalue <span style="color: #990000">*</span> <span style="color: #990000">);</span>
-<span style="color: #000000">   78:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #009900">void</span> <span style="font-weight: bold"><span style="color: #000000">jdel</span></span><span style="color: #990000">(</span> jvalue <span style="color: #990000">*</span> <span style="color: #990000">);</span>
-<span style="color: #000000">   79:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span><span style="font-weight: bold"><span style="color: #000000">jparse</span></span><span style="color: #990000">(</span> <span style="color: #008080">FILE</span> <span style="color: #990000">*</span>fp <span style="color: #990000">);</span>
-<span style="color: #000000">   80:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span><span style="font-weight: bold"><span style="color: #000000">jupdate</span></span><span style="color: #990000">(</span>  jvalue <span style="color: #990000">*</span> <span style="color: #990000">);</span>
-<span style="color: #000000">   81:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #009900">int</span> <span style="font-weight: bold"><span style="color: #000000">jdump</span></span><span style="color: #990000">(</span> <span style="color: #008080">FILE</span> <span style="color: #990000">*</span>fp<span style="color: #990000">,</span> <span style="font-weight: bold"><span style="color: #0000FF">const</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span>j <span style="color: #990000">);</span>
-<span style="color: #000000">   82:</span>
-<span style="color: #000000">   83:</span> <span style="font-weight: bold"><span style="color: #000080">#endif</span></span>
-<span style="color: #000000">   84:</span> </tt></pre></div></div>
+<div class="content"></div></div>
 <div class="paragraph"><p><a href="index.html">Back</a> to the main page.</p></div>
 </div>
 </div>
@@ -837,7 +750,7 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-08-02 12:04:39 EDT
+Last updated 2014-11-17 11:41:49 EST
 </div>
 </div>
 </body>

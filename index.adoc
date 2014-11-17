@@ -1,7 +1,7 @@
 Lightweight JSON Parsing in C
 =============================
 Bob Krzaczek <krz@cis.rit.edu>
-v1.0.5, 2014-Aug-11: Rob Reay keeps me honest.
+v1.0.6, 2014-Nov-17: It is always the unreadable that occurs.
 :toc:
 :icons:
 :encoding: utf-8
@@ -25,7 +25,7 @@ you have an XML parser but no JSON parser available in your
 environment.
 
 Primarily, this is for people who need to read JSON in ksh93, but
-don't want to mess with builtins and the like.
+don't want to mess with shared libraries (“builtins”)  and the like.
 
 == Why ==
 
@@ -58,7 +58,7 @@ and _rich_ structures in ksh93.
 
 The sources to *jsoncvt* are written assuming only C99 and
 POSIX.1-2001. They should compile just about anywhere reasonable
-without modification.
+without modification, without any warnings or other diagnostics.
 
 *link:jsonh.html[json.h], json.c*::
     The heart of the software, a fast and lightweight JSON parser.
@@ -94,6 +94,16 @@ generally available on your system. Easy peasy:
 2. Place the resulting *jsoncvt* into a *.../bin* directory of your
    choice.
 3. Place *jsoncvt.1* into a *.../man/man1* directory of your choice.
+
+TIP: Some installations of C compilers support the C99 standard, but
+aren't compliant by default. That's no problem. In those cases, you
+just need to pass an appropriate CFLAGS setting on the command line.
+For example, to coax some GNU cc installations along, you might want
+to run *make* like this +
+ +
++$ make CFLAGS=-std=c99+ +
+ +
+Thanks to Jukka Inkeri for this tip.
 
 === Using jsoncvt ===
 
@@ -246,8 +256,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 == Other Copyrights ==
 
 While the code presented in *sanity.h* and *sanity.c* is original, it
-is certainly inspired by the excellent book, "The Practice of
-Programming" by Brian W. Kernighan and Rob Pike. Quoting from that
+is certainly inspired by the excellent book, “The Practice of
+Programming” by Brian W. Kernighan and Rob Pike. Quoting from that
 source:
 
 [quote,'http://cm.bell-labs.com/cm/cs/tpop/[The Practice Of Programming]']
