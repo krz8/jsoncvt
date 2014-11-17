@@ -736,7 +736,7 @@ asciidoc.install(2);
 <h1>Lightweight JSON Parsing in C</h1>
 <span id="author">Bob Krzaczek</span><br />
 <span id="email"><code>&lt;<a href="mailto:krz@cis.rit.edu">krz@cis.rit.edu</a>&gt;</code></span><br />
-<span id="revnumber">version 1.0.2,</span>
+<span id="revnumber">version 1.0.4,</span>
 <span id="revdate">2014-Aug-01</span>
 <br /><span id="revremark">Rob Reay keeps me honest.</span>
 <div id="toc">
@@ -850,7 +850,7 @@ POSIX.1-2001. They should compile just about anywhere reasonable
 without modification.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<strong>json.h, json.c</strong>
+<strong><a href="jsonh.html">json.h</a>, json.c</strong>
 </dt>
 <dd>
 <p>
@@ -935,6 +935,7 @@ Place <strong>jsoncvt.1</strong> into a <strong>&#8230;/man/man1</strong> direct
 </div>
 <div class="sect2">
 <h3 id="_using_jsoncvt">Using jsoncvt</h3>
+<div class="paragraph"><p>There is a <a href="jsoncvt.html">manual page</a>, as alluded to above.</p></div>
 <div class="paragraph"><p><strong>jsoncvt</strong> operates as a filter. For example, let&#8217;s say you had this
 JSON stream:</p></div>
 <div class="listingblock">
@@ -987,6 +988,9 @@ $ print "${foo.lotto[*]}"
 </div>
 <div class="sect2">
 <h3 id="_using_the_parser">Using the Parser</h3>
+<div class="paragraph"><p>A <a href="jsonh.html">description of the jvalue tree</a> appears in
+<strong>json.h</strong>. This, plus a handful of functions like <strong>jparse()</strong>
+and <strong>jupdate()</strong> are all there is to the parser API.</p></div>
 <div class="paragraph"><p>Open a stdio file stream to read the JSON data that needs to be
 parsed, and supply it to <strong>jparse()</strong>. Either a pointer to a JSON value
 is returned (which recursively represents the parse tree), or NULL is
@@ -1133,7 +1137,7 @@ Technologies. All rights reserved. Mon Mar 19 13:59:27 EST 2001</p></div>
 <div class="sect1">
 <h2 id="_where">Where</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><a href="jsoncvt-1.0.2.tar.xz">jsoncvt-1.0.2.tar.xz</a></p></div>
+<div class="paragraph"><p><a href="jsoncvt-1.0.4.tar.xz">jsoncvt-1.0.4.tar.xz</a></p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1152,8 +1156,8 @@ like I need a hole in my head.</pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 1.0.2<br />
-Last updated 2014-08-01 22:30:10 EDT
+Version 1.0.4<br />
+Last updated 2014-08-02 12:50:08 EDT
 </div>
 </div>
 </body>

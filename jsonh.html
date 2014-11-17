@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.9" />
-<title>jsoncvt(1)</title>
+<title>json.h</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -733,205 +733,111 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>jsoncvt(1)</h1>
+<h1>json.h</h1>
 <span id="author">Bob Krzaczek</span><br />
 <span id="email"><code>&lt;<a href="mailto:krz@cis.rit.edu">krz@cis.rit.edu</a>&gt;</code></span><br />
-<span id="revdate">2014-Jul-14</span>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_name">NAME</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>jsoncvt - convert JSON to native language representations</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_synopsis">SYNOPSIS</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>jsoncvt [-kx] [label]</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_description">DESCRIPTION</h2>
-<div class="sectionbody">
-<div class="paragraph"><p><strong>jsoncvt</strong> reads JSON formatted data from its standard input, and
-prints it back out in a native represetnation for various languages on
-the standard output stream. It is mostly meant for dynamic languages
-that can evaluate new values on the fly, but do not already have a
-JSON parser built into them.</p></div>
-<div class="paragraph"><p>If the <strong>label</strong> argument is supplied, it becomes the name of the
-toplevel value in the tree of parsed JSON data. Some languages do not
-require this (XML). Other languages (ksh), which must bind their
-values to a variable, do require some kind of name to label data. When
-not supplied, the metaword <strong>foobar</strong> is used by default.</p></div>
-<div class="paragraph"><p>UTF-8 JSON input is assumed. Both the <strong>ksh93</strong> and <strong>XML</strong> output formats
-support it and use the appropriate mechanisms.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_options">OPTIONS</h2>
-<div class="sectionbody">
-<div class="dlist"><dl>
-<dt class="hdlist1">
-<strong>-k</strong>
-</dt>
-<dd>
-<p>
-        Converts the parsed JSON data into <strong>ksh93</strong> text.
-</p>
-</dd>
-<dt class="hdlist1">
-<strong>-x</strong>
-</dt>
-<dd>
-<p>
-        Converts the parsed JSON data into a compact <strong>XML</strong> format.
-        This might be useful when you have an XML parser but no JSON
-        parser.
-</p>
-</dd>
-</dl></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_formats">FORMATS</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Refer to the following JSON stream when considering the formats below.</p></div>
+<div class="paragraph"><p><a href="index.html">Back</a> to the main page.</p></div>
 <div class="listingblock">
-<div class="content">
-<pre><code>{
-    "first" : "Bob",
-    "last" : "Krzaczek",
-    "email" : "Robert.Krzaczek@gmail.com",
-    "lucky" : 13,
-    "quarter" : 0.25,
-    "empty" : null,
-    "nerd" : true,
-    "lotto" : [ 9, 12, 17, 38, 45, 46 ]
-}</code></pre>
-</div></div>
-<div class="sect2">
-<h3 id="_ksh93">ksh93</h3>
-<div class="paragraph"><p>This output format uses features in a recent version of ksh93,
-supporting compound variables and typed arrays. Its output is meant to
-be fed to an <strong>eval</strong> statement, and assumes standard aliases and
-setting for variables such as <strong>IFS</strong> are in place.</p></div>
-<div class="paragraph"><p>The JSON above is rendered in the following format:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>compound foobar=(
-  first=$'Bob'
-  last=$'Krzaczek'
-  email=$'Robert.Krzaczek@gmail.com'
-  integer lucky=13
-  float quarter=0.25
-  empty=
-  bool nerd=true
-  integer -a lotto=(
-    9
-    12
-    17
-    38
-    45
-    46
-  )
-)</code></pre>
-</div></div>
-</div>
-<div class="sect2">
-<h3 id="_xml">XML</h3>
-<div class="paragraph"><p>This output format is a fairly minimal use of XML, but represents the
-most natural translation of data that&#8217;s already limited to JSON
-constructs. The result wouldn&#8217;t be hard to parse with either SAX or
-DOM approaches.</p></div>
-<div class="paragraph"><p>The following grammar allows more than just an array or object at the
-top level of the data; in that way, it is something of a superset of
-JSON.</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>&lt;!ELEMENT jsoncvt (array|object|string|number|null|true|false)&gt;
-&lt;!ELEMENT array (array|object|string|number|null|true|false)*&gt;
-&lt;!ATTLIST array name CDATA #IMPLIED&gt;
-&lt;!ELEMENT object (array|object|string|number|null|true|false)*&gt;
-&lt;!ATTLIST object name CDATA #IMPLIED&gt;
-&lt;!ELEMENT number (#PCDATA)&gt;
-&lt;!ATTLIST number name CDATA #IMPLIED&gt;
-&lt;!ELEMENT string (#PCDATA)&gt;
-&lt;!ATTLIST string name CDATA #IMPLIED&gt;
-&lt;!ELEMENT null EMPTY&gt;
-&lt;!ATTLIST null name CDATA #IMPLIED&gt;
-&lt;!ELEMENT true EMPTY&gt;
-&lt;!ATTLIST true name CDATA #IMPLIED&gt;
-&lt;!ELEMENT false EMPTY&gt;
-&lt;!ATTLIST false name CDATA #IMPLIED&gt;</code></pre>
-</div></div>
-<div class="paragraph"><p>Converting the JSON example above yields:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>&lt;?xml version='1.0' encoding='utf-8' ?&gt;
-&lt;data&gt;
-  &lt;object name='foobar'&gt;
-  &lt;string name='first'&gt;Bob&lt;/string&gt;
-  &lt;string name='last'&gt;Krzaczek&lt;/string&gt;
-  &lt;string name='email'&gt;Robert.Krzaczek@gmail.com&lt;/string&gt;
-  &lt;number name='lucky'&gt;13&lt;/number&gt;
-  &lt;number name='quarter'&gt;0.25&lt;/number&gt;
-  &lt;null name='empty' /&gt;
-  &lt;true name='nerd' /&gt;
-  &lt;array name='lotto'&gt;
-    &lt;number&gt;9&lt;/number&gt;
-    &lt;number&gt;12&lt;/number&gt;
-    &lt;number&gt;17&lt;/number&gt;
-    &lt;number&gt;38&lt;/number&gt;
-    &lt;number&gt;45&lt;/number&gt;
-    &lt;number&gt;46&lt;/number&gt;
-  &lt;/array&gt;
-  &lt;/object&gt;
-&lt;/data&gt;</code></pre>
-</div></div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_status">STATUS</h2>
-<div class="sectionbody">
-<div class="dlist"><dl>
-<dt class="hdlist1">
-<strong>0</strong>
-</dt>
-<dd>
-<p>
-        Success. The JSON file contains no errors, was successfully
-        parsed, and the selected output format was generated.
-</p>
-</dd>
-<dt class="hdlist1">
-<strong>1</strong>
-</dt>
-<dd>
-<p>
-        Failure. There was either a problem in the JSON data provided,
-        or some aspect of that data could not be represented in the
-        selected format.
-</p>
-</dd>
-<dt class="hdlist1">
-<strong>2</strong>
-</dt>
-<dd>
-<p>
-        Failure. There was a problem with the options or arguments
-        provided on the command line.
-</p>
-</dd>
-</dl></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #000000">    1:</span> <span style="font-style: italic"><span style="color: #9A1900">/* See one of the index files for license and other details. */</span></span>
+<span style="color: #000000">    2:</span> <span style="font-weight: bold"><span style="color: #000080">#ifndef</span></span> jsoncvt_json_h
+<span style="color: #000000">    3:</span> <span style="font-weight: bold"><span style="color: #000080">#define</span></span> jsoncvt_json_h
+<span style="color: #000000">    4:</span> <span style="font-weight: bold"><span style="color: #000080">#pragma</span></span> once
+<span style="color: #000000">    5:</span> <span style="font-weight: bold"><span style="color: #000080">#include</span></span> <span style="color: #FF0000">&lt;stdio.h&gt;</span>
+<span style="color: #000000">    6:</span>
+<span style="color: #000000">    7:</span> <span style="font-style: italic"><span style="color: #9A1900">/** The different types of values in our JSON parser. Unlike the</span></span>
+<span style="color: #000000">    8:</span> <span style="font-style: italic"><span style="color: #9A1900"> *  standard, we discriminate between integer and real values. */</span></span>
+<span style="color: #000000">    9:</span> <span style="font-weight: bold"><span style="color: #0000FF">enum</span></span> jtypes <span style="color: #FF0000">{</span>
+<span style="color: #000000">   10:</span>     jnull<span style="color: #990000">,</span>      <span style="font-style: italic"><span style="color: #9A1900">/**&lt; The JSON "null" value. */</span></span>
+<span style="color: #000000">   11:</span>     jtrue<span style="color: #990000">,</span>      <span style="font-style: italic"><span style="color: #9A1900">/**&lt; Just a simple "true" value. */</span></span>
+<span style="color: #000000">   12:</span>     jfalse<span style="color: #990000">,</span>     <span style="font-style: italic"><span style="color: #9A1900">/**&lt; just a simple "false" value. */</span></span>
+<span style="color: #000000">   13:</span>     jstring<span style="color: #990000">,</span>    <span style="font-style: italic"><span style="color: #9A1900">/**&lt; Just your run of the mill string. */</span></span>
+<span style="color: #000000">   14:</span>     jnumber<span style="color: #990000">,</span>    <span style="font-style: italic"><span style="color: #9A1900">/**&lt; A JSON number (still just a string). */</span></span>
+<span style="color: #000000">   15:</span>     jarray<span style="color: #990000">,</span>     <span style="font-style: italic"><span style="color: #9A1900">/**&lt; A vector of values. */</span></span>
+<span style="color: #000000">   16:</span>     jobject<span style="color: #990000">,</span>    <span style="font-style: italic"><span style="color: #9A1900">/**&lt; An assoc. array of names and arbitrary values. */</span></span>
+<span style="color: #000000">   17:</span>     jint<span style="color: #990000">,</span>       <span style="font-style: italic"><span style="color: #9A1900">/**&lt; A JSON number parsed into a native integer. */</span></span>
+<span style="color: #000000">   18:</span>     jreal<span style="color: #990000">,</span>      <span style="font-style: italic"><span style="color: #9A1900">/**&lt; A JSON number parsed into a long double. */</span></span>
+<span style="color: #000000">   19:</span> <span style="color: #FF0000">}</span><span style="color: #990000">;</span>
+<span style="color: #000000">   20:</span>
+<span style="color: #000000">   21:</span> <span style="font-style: italic"><span style="color: #9A1900">/** A jvalue represents the different values found in a parse of a</span></span>
+<span style="color: #000000">   22:</span> <span style="font-style: italic"><span style="color: #9A1900"> *  JSON doc. A value can be terminal, like a string or a number, or</span></span>
+<span style="color: #000000">   23:</span> <span style="font-style: italic"><span style="color: #9A1900"> *  it can nest, as with arrays and objects. The value of #d reflects</span></span>
+<span style="color: #000000">   24:</span> <span style="font-style: italic"><span style="color: #9A1900"> *  which part of the union is value. */</span></span>
+<span style="color: #000000">   25:</span> <span style="font-weight: bold"><span style="color: #0000FF">typedef</span></span> <span style="font-weight: bold"><span style="color: #0000FF">struct</span></span> <span style="color: #008080">jvalue</span> <span style="color: #FF0000">{</span>
+<span style="color: #000000">   26:</span>
+<span style="color: #000000">   27:</span>     <span style="font-style: italic"><span style="color: #9A1900">/** Just your basic discriminator, describing which part of the</span></span>
+<span style="color: #000000">   28:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  union below is active. When this is jtrue, jfalse, or jnull,</span></span>
+<span style="color: #000000">   29:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  nothing in #u is valid (being unnecessary); all other values</span></span>
+<span style="color: #000000">   30:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  correspond to one of the #u members as described below. */</span></span>
+<span style="color: #000000">   31:</span>     <span style="font-weight: bold"><span style="color: #0000FF">enum</span></span> <span style="color: #008080">jtypes</span> d<span style="color: #990000">;</span>
+<span style="color: #000000">   32:</span>
+<span style="color: #000000">   33:</span>     <span style="font-style: italic"><span style="color: #9A1900">/** Some values have a name associated with them; in a JSON</span></span>
+<span style="color: #000000">   34:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  object, for example, the value is assigned to a specific name.</span></span>
+<span style="color: #000000">   35:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  When #d is jobject, this string should point to the name of a</span></span>
+<span style="color: #000000">   36:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  member (whose value is in #u). For other values of #d, this</span></span>
+<span style="color: #000000">   37:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  member should be null. A previous implementation used a</span></span>
+<span style="color: #000000">   38:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  separate structure for these pairings, but placing the name</span></span>
+<span style="color: #000000">   39:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  inside each value only costs an extra 4 or 8 bytes yet</span></span>
+<span style="color: #000000">   40:</span> <span style="font-style: italic"><span style="color: #9A1900">     *  simplifies the tree quite a bit for our client. */</span></span>
+<span style="color: #000000">   41:</span>     <span style="color: #009900">char</span> <span style="color: #990000">*</span>n<span style="color: #990000">;</span>
+<span style="color: #000000">   42:</span>
+<span style="color: #000000">   43:</span>     <span style="font-style: italic"><span style="color: #9A1900">/** According to #d above, one or none of these are the active value. */</span></span>
+<span style="color: #000000">   44:</span>     <span style="font-weight: bold"><span style="color: #0000FF">union</span></span> <span style="color: #FF0000">{</span>
+<span style="color: #000000">   45:</span>         <span style="font-style: italic"><span style="color: #9A1900">/** When #d is jstring or jnumber, this string is active in</span></span>
+<span style="color: #000000">   46:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  the union. While obvious for jstring, why would this be</span></span>
+<span style="color: #000000">   47:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  used for jnumber? Because, often, there's no need to parse</span></span>
+<span style="color: #000000">   48:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  the number value into something native. While integers are</span></span>
+<span style="color: #000000">   49:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  exact, there's often an unavoidable loss of preceision</span></span>
+<span style="color: #000000">   50:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  when converting real numbers. So, we defer it as long as</span></span>
+<span style="color: #000000">   51:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  we can. If the client application actually *wants* a</span></span>
+<span style="color: #000000">   52:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  parsed value, it can convert the string to a native value,</span></span>
+<span style="color: #000000">   53:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  cache it away in the #i or #r members, and change the</span></span>
+<span style="color: #000000">   54:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  discriminator to jint or jreal accordingly. This avoids</span></span>
+<span style="color: #000000">   55:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  unnecessary parsing work and loss of precision, but</span></span>
+<span style="color: #000000">   56:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  doesn't make it unduly hard for a client to deal with. See</span></span>
+<span style="color: #000000">   57:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  jupdate() as a function the client can call to do just</span></span>
+<span style="color: #000000">   58:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  that. */</span></span>
+<span style="color: #000000">   59:</span>         <span style="color: #009900">char</span> <span style="color: #990000">*</span>s<span style="color: #990000">;</span>
+<span style="color: #000000">   60:</span>
+<span style="color: #000000">   61:</span>         <span style="font-style: italic"><span style="color: #9A1900">/** When the discriminator is jint, this integer is active. */</span></span>
+<span style="color: #000000">   62:</span>         <span style="color: #009900">long</span> <span style="color: #009900">long</span> i<span style="color: #990000">;</span>
+<span style="color: #000000">   63:</span>
+<span style="color: #000000">   64:</span>         <span style="font-style: italic"><span style="color: #9A1900">/** When the discriminator is jreal, this long double is</span></span>
+<span style="color: #000000">   65:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  active. */</span></span>
+<span style="color: #000000">   66:</span>         <span style="color: #009900">long</span> <span style="color: #009900">double</span> r<span style="color: #990000">;</span>
+<span style="color: #000000">   67:</span>
+<span style="color: #000000">   68:</span>         <span style="font-style: italic"><span style="color: #9A1900">/** When the discriminator is jarray or jobject, this</span></span>
+<span style="color: #000000">   69:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  zero-terminated vector of pointers to jvalue is active.</span></span>
+<span style="color: #000000">   70:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  You'll find the ptrvec routines make building these</span></span>
+<span style="color: #000000">   71:</span> <span style="font-style: italic"><span style="color: #9A1900">         *  easy. */</span></span>
+<span style="color: #000000">   72:</span>         <span style="font-weight: bold"><span style="color: #0000FF">struct</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">**</span>v<span style="color: #990000">;</span>
+<span style="color: #000000">   73:</span>     <span style="color: #FF0000">}</span> u<span style="color: #990000">;</span>
+<span style="color: #000000">   74:</span> <span style="color: #FF0000">}</span> jvalue<span style="color: #990000">;</span>
+<span style="color: #000000">   75:</span>
+<span style="color: #000000">   76:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span><span style="font-weight: bold"><span style="color: #000000">jnew</span></span><span style="color: #990000">();</span>
+<span style="color: #000000">   77:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span><span style="font-weight: bold"><span style="color: #000000">jclear</span></span><span style="color: #990000">(</span> jvalue <span style="color: #990000">*</span> <span style="color: #990000">);</span>
+<span style="color: #000000">   78:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #009900">void</span> <span style="font-weight: bold"><span style="color: #000000">jdel</span></span><span style="color: #990000">(</span> jvalue <span style="color: #990000">*</span> <span style="color: #990000">);</span>
+<span style="color: #000000">   79:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span><span style="font-weight: bold"><span style="color: #000000">jparse</span></span><span style="color: #990000">(</span> <span style="color: #008080">FILE</span> <span style="color: #990000">*</span>fp <span style="color: #990000">);</span>
+<span style="color: #000000">   80:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span><span style="font-weight: bold"><span style="color: #000000">jupdate</span></span><span style="color: #990000">(</span>  jvalue <span style="color: #990000">*</span> <span style="color: #990000">);</span>
+<span style="color: #000000">   81:</span> <span style="font-weight: bold"><span style="color: #0000FF">extern</span></span> <span style="color: #009900">int</span> <span style="font-weight: bold"><span style="color: #000000">jdump</span></span><span style="color: #990000">(</span> <span style="color: #008080">FILE</span> <span style="color: #990000">*</span>fp<span style="color: #990000">,</span> <span style="font-weight: bold"><span style="color: #0000FF">const</span></span> <span style="color: #008080">jvalue</span> <span style="color: #990000">*</span>j <span style="color: #990000">);</span>
+<span style="color: #000000">   82:</span>
+<span style="color: #000000">   83:</span> <span style="font-weight: bold"><span style="color: #000080">#endif</span></span>
+<span style="color: #000000">   84:</span> </tt></pre></div></div>
+<div class="paragraph"><p><a href="index.html">Back</a> to the main page.</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-08-01 21:00:02 EDT
+Last updated 2014-08-02 12:04:39 EDT
 </div>
 </div>
 </body>

@@ -1,7 +1,7 @@
 Lightweight JSON Parsing in C
 =============================
 Bob Krzaczek <krz@cis.rit.edu>
-v1.0.2, 2014-Aug-01: Rob Reay keeps me honest.
+v1.0.4, 2014-Aug-01: Rob Reay keeps me honest.
 :toc:
 :icons:
 :encoding: utf-8
@@ -60,7 +60,7 @@ The sources to *jsoncvt* are written assuming only C99 and
 POSIX.1-2001. They should compile just about anywhere reasonable
 without modification.
 
-*json.h, json.c*::
+*link:jsonh.html[json.h], json.c*::
     The heart of the software, a fast and lightweight JSON parser.
 *ksh.h, ksh.c*::
     Emits a parsed JSON tree in ksh93 syntax.
@@ -96,6 +96,8 @@ generally available on your system. Easy peasy:
 3. Place *jsoncvt.1* into a *.../man/man1* directory of your choice.
 
 === Using jsoncvt ===
+
+There is a link:jsoncvt.html[manual page], as alluded to above.
 
 *jsoncvt* operates as a filter. For example, let's say you had this
 JSON stream:
@@ -150,6 +152,10 @@ $ print "${foo.lotto[*]}"
 ---------------------------------------
 
 === Using the Parser ===
+
+A link:jsonh.html[description of the jvalue tree] appears in
+*json.h*. This, plus a handful of functions like *jparse()*
+and *jupdate()* are all there is to the parser API.
 
 Open a stdio file stream to read the JSON data that needs to be
 parsed, and supply it to *jparse()*. Either a pointer to a JSON value
@@ -246,7 +252,7 @@ _____________________________________________________________________
 
 == Where ==
 
-link:jsoncvt-1.0.2.tar.xz[]
+link:jsoncvt-{revnumber}.tar.xz[]
 
 == Miscellaneous ==
 

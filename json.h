@@ -9,7 +9,7 @@
 enum jtypes {
     jnull,      /**< The JSON "null" value. */
     jtrue,      /**< Just a simple "true" value. */
-    jfalse,     /**< just a simple "false" value. */
+    jfalse,     /**< Just a simple "false" value. */
     jstring,    /**< Just your run of the mill string. */
     jnumber,    /**< A JSON number (still just a string). */
     jarray,     /**< A vector of values. */
@@ -46,7 +46,7 @@ typedef struct jvalue {
          *  the union. While obvious for jstring, why would this be
          *  used for jnumber? Because, often, there's no need to parse
          *  the number value into something native. While integers are
-         *  exact, there's often an unavoidable loss of preceision
+         *  exact, there's often an unavoidable loss of precision
          *  when converting real numbers. So, we defer it as long as
          *  we can. If the client application actually *wants* a
          *  parsed value, it can convert the string to a native value,

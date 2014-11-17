@@ -2,7 +2,7 @@ ME	= jsoncvt
 SRCS	= main.c sanity.c twine.c ptrvec.c json.c xml.c ksh.c
 
 OBJS	= $(SRCS:.c=.o)
-DOCS	= jsoncvt.1 jsoncvt.html index.html
+DOCS	= jsoncvt.1 jsoncvt.html index.html jsonh.html
 
 all:	$(ME)
 $(ME):	$(OBJS)
