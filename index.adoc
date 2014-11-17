@@ -1,7 +1,7 @@
 Lightweight JSON Parsing in C
 =============================
 Bob Krzaczek <krz@cis.rit.edu>
-v1.0.1, 2014-Aug-01: fixed some documentation typos
+v1.0.2, 2014-Aug-01: Rob Reay keeps me honest.
 :toc:
 :icons:
 :encoding: utf-8
@@ -246,7 +246,7 @@ _____________________________________________________________________
 
 == Where ==
 
-link:jsoncvt-1.0.1.tar.xz[]
+link:jsoncvt-1.0.2.tar.xz[]
 
 == Miscellaneous ==
 

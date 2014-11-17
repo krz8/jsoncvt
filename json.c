@@ -111,7 +111,7 @@ jvalue *
 jclear( jvalue *j )
 {
     if( j ) {
-        efree( j->n );
+        free( j->n );
 
         switch( j->d ) {
         case jarray:
@@ -119,12 +119,12 @@ jclear( jvalue *j )
             if( j->u.v )
                 for( jvalue **jv = j->u.v; *jv; ++jv )
                     jdel( *jv );
-            efree( j->u.v );
+            free( j->u.v );
             break;
 
         case jstring:
         case jnumber:
-            efree( j->u.s );
+            free( j->u.s );
             break;
 
         default:
@@ -144,7 +144,7 @@ jclear( jvalue *j )
 void
 jdel( jvalue *j )
 {
-    efree( jclear( j ));
+    free( jclear( j ));
 }
 
 /** Report an early EOF; that is, that the input stream ended before a
@@ -371,13 +371,13 @@ readobjel( ifile *f )
 
     if( getchskip( f ) != ':' ) {
         ierr( f, "expected colon in object element" );
-        efree( n );
+        free( n );
         return 0;
     }
 
     jvalue *j = readvalue( f );
     if( !j )
-        efree( n );
+        free( n );
     else
         j->n = n;
     return j;

@@ -16,7 +16,6 @@
 extern void *emalloc( size_t );
 extern void *erealloc( void *, size_t );
 extern char *estrdup( const char * );
-extern void *efree( void* );
 extern void err( const char *msg, ... );
 extern void die( int xit, const char *msg, ... );
 

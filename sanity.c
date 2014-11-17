@@ -38,19 +38,6 @@ estrdup( const char *s )
     return s ? strcpy( emalloc( strlen( s ) + 1 ), s ) : 0;
 }
 
-/** A free(3) variant that avoids freeing null pointers. There really
- * isn't an "error" handling aspect to this function, so calling it
- * "efree" is something of a misnomer. On the other hand, it matches
- * the other sanity functions like emalloc, so it's not completely
- * arbitrary. */
-void *
-efree( void *ptr )
-{
-    if( ptr )
-        free( ptr );
-    return ptr;
-}
-
 /** Wraps the common part of our formatting for err() and die() below. */
 static void
 va_err( const char *extra, const char *msg, va_list ap )
