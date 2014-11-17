@@ -1,4 +1,4 @@
-/* See the README file for license and other details. */
+/* See one of the index files for license and other details. */
 #ifndef jsoncvt_ptrvec_h
 #define jsoncvt_ptrvec_h
 #pragma once

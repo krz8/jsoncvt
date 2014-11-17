@@ -1,4 +1,4 @@
-/* See the README file for license and other details. */
+/* See one of the index files for license and other details. */
 #ifndef jsoncvt_sanity_h
 #define jsoncvt_sanity_h
 #pragma once

@@ -1,4 +1,4 @@
-/* See the README file for license and other details. */
+/* See one of the index files for license and other details. */
 #define _POSIX_C_SOURCE 200112L
 #include <stddef.h>
 #include <stdint.h>
