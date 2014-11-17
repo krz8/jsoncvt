@@ -532,6 +532,32 @@ jparse( FILE *fp )
     return readvalue( &f );
 }
 
+/** This is only used by jupdate, so we hide it static to this file.
+ *  It returns true if the supplied string appears to just be an
+ *  integer number.  Specifically, this means it does not contain an
+ *  exponent nor a decimal point, as those typically introduce reals.
+ *  It's arguable that an exponent, itself, doesn't necessarily mean
+ *  a value is a real.  But, because it's so easy to exceed the range
+ *  of an integer with a really huge exponent, nothing short of
+ *  parsing the number itself makes it a safe call to deal with
+ *  exponential integers.  So, exponents mean "not integer".  Also,
+ #  because we assume that we're parsing numbers gathered by
+ *  readnumber() via jparse(), we don't bother testing on isdigit()
+ #  like a well behaved function would; otherwise, failing isdigit()
+ #  in the while loop would also be an immediate return false. */
+static bool
+integerp( const char *str )
+{
+    if( *str == '-' || *str == '+' )
+        ++str;
+    while( *str )
+        if( *str == '.' || *str == 'e' || *str == 'E' )
+            return false;
+	else
+	    ++str;
+    return true;
+}
+
 /** Given a jvalue, "update" it or its children. "Update" means
  *  several things, but it basically finishes the work started by
  *  jparse(). jparse() implements a quick parse of a JSON stream, but
@@ -545,7 +571,7 @@ jupdate( jvalue *j )
     if( j )
         switch( j->d ) {
         case jnumber:
-            if( strchr( j->u.s, '.' ) == 0 ) {
+	    if( integerp( j->u.s )) {
                 j->u.i = strtoll( j->u.s, 0, 10 );
                 j->d = jint;
             } else {
@@ -553,7 +579,8 @@ jupdate( jvalue *j )
                 j->d = jreal;
             }
             break;
-        case jarray: case jobject:
+        case jarray:
+	case jobject:
             for( jvalue **jv = j->u.v; *jv; ++jv )
                 jupdate( *jv );
             break;
