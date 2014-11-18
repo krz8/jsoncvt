@@ -17,7 +17,7 @@ bool
 writexml( FILE *fp, const jvalue *j )
 {
     fputs( "<?xml version='1.0' encoding='utf-8' ?>\n", fp );
-    fputs( "<!DOCTYPE jsoncvt PUBLIC '-//KRZ//DTD jsoncvt 1.0.6//EN' 'http://www.cis.rit.edu/~krz/hacks/jsoncvt/jsoncvt.dtd'>\n", fp );
+    fputs( "<!DOCTYPE jsoncvt PUBLIC '-//KRZ//DTD jsoncvt 1.0.7//EN' 'http://www.cis.rit.edu/~krz/hacks/jsoncvt/jsoncvt.dtd'>\n", fp );
     fputs( "<jsoncvt>\n", fp );
     int r = xvalue( fp, j, 1 );
     fputs( "</jsoncvt>\n", fp );
