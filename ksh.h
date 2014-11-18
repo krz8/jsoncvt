@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include "json.h"
 
+extern bool usemap;	/* use map instead of associative array in output */
+
 extern bool writeksh( FILE *, const jvalue * );
 
 #endif

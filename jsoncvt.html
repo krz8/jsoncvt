@@ -748,7 +748,7 @@ asciidoc.install();
 <div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>jsoncvt [-kx] [label]</p></div>
+<div class="paragraph"><p>jsoncvt [-Akx] [label]</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -772,6 +772,18 @@ support it and use the appropriate mechanisms.</p></div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>-A</strong>
+</dt>
+<dd>
+<p>
+        When converting to <strong>ksh93</strong> format, JSON objects are reprented
+        as associative arrays, instead of compound variables.
+        This is especially useful when object key strings containing
+        characters outside the usual characters used in variable
+        names are present.
+</p>
+</dd>
 <dt class="hdlist1">
 <strong>-k</strong>
 </dt>
@@ -828,6 +840,27 @@ setting for variables such as <strong>IFS</strong> are in place.</p></div>
   empty=
   bool nerd=true
   integer -a lotto=(
+    9
+    12
+    17
+    38
+    45
+    46
+  )
+)</code></pre>
+</div></div>
+<div class="paragraph"><p>When the <strong>-A</strong> flag is in effect, the output becomes:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>typeset -A foobar=(
+  [first]=$'Bob'
+  [last]=$'Krzaczek'
+  [email]=$'Robert.Krzaczek@gmail.com'
+  [lucky]=13
+  [quarter]=0.25
+  [empty]=
+  [nerd]=true
+  [lotto]=(
     9
     12
     17
@@ -931,7 +964,7 @@ JSON.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-11-17 11:41:49 EST
+Last updated 2014-11-17 20:26:04 EST
 </div>
 </div>
 </body>

@@ -7,6 +7,11 @@
 #include "json.h"
 #include "ksh.h"
 
+/** Originally, we emitted compound variables in out output.
+ *  But, there are times when associative arrays make more sense.
+ *  Should we do that now? */
+bool usemap = false;
+
 /** Given a nesting depth (zero being the outermost element), emit
  *  some number of spaces that are appropriate for that depth. */
 static void
@@ -16,8 +21,7 @@ indent( FILE *fp, unsigned depth )
         fputs( "  ", fp );
 }
 
-/** Write the string, in ksh C-string format, to the output stream. A
- * trailing newline is automatically appended. */
+/** Write the string, in ksh C-string format, to the output stream. */
 static void
 emit( FILE *out, const char *s )
 {
@@ -37,7 +41,15 @@ emit( FILE *out, const char *s )
         else if( *s < 32 )      fprintf( out, "\\x%02x", *s );
         else if( *s < 127 )     fputc( *s, out );
         else                    fprintf( out, "\\x%02x", *s );
-    fputs( "'\n", out );
+    fputc( '\'', out );
+}
+
+/** Just like emit(), but with a trailing newline. */
+static void
+emitnl( FILE *out, const char *s )
+{
+    emit( out, s );
+    fputc( '\n', out );
 }
 
 /** Write the string, in plain text, to the output stream. Safely
@@ -113,8 +125,10 @@ allints( const jvalue *j )
  *  we're only called from ktypeset(), we can make safe assumptions
  *  about \a j. */
 void
-ktypesetarray( FILE *fp, const jvalue *j )
+ktypesetarray( FILE *fp, const jvalue *j, unsigned depth )
 {
+    if( usemap && depth )
+        return;
     if( allints( j ))
         fputs( "integer -a ", fp );
     else
@@ -138,26 +152,33 @@ ktypesetarray( FILE *fp, const jvalue *j )
  *  printed as a variable or compound member of the right type.
  *  Nothing is printed for strings and the like. */
 void
-ktypeset( FILE *fp, const jvalue *j )
+ktypeset( FILE *fp, const jvalue *j, unsigned depth )
 {
     switch( j ? j->d : jnull ) {
     case jtrue: case jfalse:
-        fputs( "bool ", fp );
+	if( !usemap || !depth )
+            fputs( "bool ", fp );
         break;
     case jint:
-        fputs( "integer ", fp );
+	if( !usemap || !depth )
+            fputs( "integer ", fp );
         break;
     case jreal:
-        fputs( "float ", fp );
+	if( !usemap || !depth )
+            fputs( "float ", fp );
         break;
     case jnumber:
-        fputs(( j->u.s && strchr( j->u.s, '.' )) ? "float " : "integer ", fp );
+	if( !usemap || !depth )
+            fputs(( j->u.s && strchr( j->u.s, '.' )) ? "float " : "integer ", fp );
         break;
     case jobject:
-        fputs( "compound ", fp );
+	if( !usemap )
+            fputs( "compound ", fp );
+	else if( !depth )
+	    fputs( "typeset -A ", fp );
         break;
     case jarray:
-        ktypesetarray( fp, j );
+        ktypesetarray( fp, j, depth );
         break;
     default:
         break;
@@ -168,13 +189,20 @@ ktypeset( FILE *fp, const jvalue *j )
  *  information preceding it. An '=' is printed at the end. If \a j
  *  does not have a name, a fake name is generated on the fly. */
 void
-kname( FILE *fp, const jvalue *j )
+kname( FILE *fp, const jvalue *j, unsigned depth )
 {
-    ktypeset( fp, j );
+    ktypeset( fp, j, depth );
 
-    if( !j || !j->n )
-        fputs( "foobar=", fp );
-    else {
+    if( !j || !j->n ) {
+	if( usemap && depth )
+	    fputs( "[foobar]=", fp );
+	else
+            fputs( "foobar=", fp );
+    } else if( usemap && depth ) {
+	fputc( '[', fp );
+	emit( fp, j->n );
+	fputs( "]=", fp );
+    } else {
         safe( fp, j->n );
         fputc( '=', fp );
     }
@@ -192,7 +220,7 @@ kvalue( FILE *fp, const jvalue *j, bool nested, unsigned depth )
     indent( fp, depth );
 
     if( !nested )
-        kname( fp, j );
+        kname( fp, j, depth );
 
     switch( j->d ) {
     case jnull:
@@ -205,7 +233,7 @@ kvalue( FILE *fp, const jvalue *j, bool nested, unsigned depth )
         fputs( "false\n", fp );
         break;
     case jstring:
-        emit( fp, j->u.s );
+        emitnl( fp, j->u.s );
         break;
     case jnumber:
         fputs( j->u.s, fp );

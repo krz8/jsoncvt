@@ -31,7 +31,7 @@
 jsoncvt \- convert JSON to native language representations
 .SH "SYNOPSIS"
 .sp
-jsoncvt [\-kx] [label]
+jsoncvt [\-Akx] [label]
 .SH "DESCRIPTION"
 .sp
 \fBjsoncvt\fR reads JSON formatted data from its standard input, and prints it back out in a native represetnation for various languages on the standard output stream\&. It is mostly meant for dynamic languages that can evaluate new values on the fly, but do not already have a JSON parser built into them\&.
@@ -40,6 +40,13 @@ If the \fBlabel\fR argument is supplied, it becomes the name of the toplevel val
 .sp
 UTF\-8 JSON input is assumed\&. Both the \fBksh93\fR and \fBXML\fR output formats support it and use the appropriate mechanisms\&.
 .SH "OPTIONS"
+.PP
+\fB\-A\fR
+.RS 4
+When converting to
+\fBksh93\fR
+format, JSON objects are reprented as associative arrays, instead of compound variables\&. This is especially useful when object key strings containing characters outside the usual characters used in variable names are present\&.
+.RE
 .PP
 \fB\-k\fR
 .RS 4
@@ -95,6 +102,34 @@ compound foobar=(
   empty=
   bool nerd=true
   integer \-a lotto=(
+    9
+    12
+    17
+    38
+    45
+    46
+  )
+)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+When the \fB\-A\fR flag is in effect, the output becomes:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+typeset \-A foobar=(
+  [first]=$\*(AqBob\*(Aq
+  [last]=$\*(AqKrzaczek\*(Aq
+  [email]=$\*(AqRobert\&.Krzaczek@gmail\&.com\*(Aq
+  [lucky]=13
+  [quarter]=0\&.25
+  [empty]=
+  [nerd]=true
+  [lotto]=(
     9
     12
     17

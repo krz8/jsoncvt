@@ -9,7 +9,7 @@ jsoncvt - convert JSON to native language representations
 
 == SYNOPSIS ==
 
-jsoncvt [-kx] [label]
+jsoncvt [-Akx] [label]
 
 == DESCRIPTION ==
 
@@ -30,6 +30,12 @@ support it and use the appropriate mechanisms.
 
 == OPTIONS ==
 
+*-A*::
+	When converting to *ksh93* format, JSON objects are reprented
+	as associative arrays, instead of compound variables.
+	This is especially useful when object key strings containing
+	characters outside the usual characters used in variable
+	names are present.
 *-k*::
         Converts the parsed JSON data into *ksh93* text.
 *-x*::
@@ -73,6 +79,28 @@ compound foobar=(
   empty=
   bool nerd=true
   integer -a lotto=(
+    9
+    12
+    17
+    38
+    45
+    46
+  )
+)
+------------------------------------
+
+When the *-A* flag is in effect, the output becomes:
+
+------------------------------------
+typeset -A foobar=(
+  [first]=$'Bob'
+  [last]=$'Krzaczek'
+  [email]=$'Robert.Krzaczek@gmail.com'
+  [lucky]=13
+  [quarter]=0.25
+  [empty]=
+  [nerd]=true
+  [lotto]=(
     9
     12
     17

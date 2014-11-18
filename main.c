@@ -8,7 +8,7 @@
 #include "xml.h"
 #include "ksh.h"
 
-const char usage[]="usage: jsoncvt [-kx] [label]\n"
+const char usage[]="usage: jsoncvt [-Akx] [label]\n"
     "example: jsoncvt -x mydata <foo.json >foo.xml\n";
 
 int
@@ -21,8 +21,11 @@ main( int argc, char *argv[] )
     bool (*output)( FILE *, const jvalue * ) = writexml;
     int opt;
 
-    while(( opt = getopt( argc, argv, "kx" )) != EOF )
+    while(( opt = getopt( argc, argv, "Akx" )) != EOF )
         switch( opt ) {
+	case 'A':
+	    usemap = true;
+	    break;
         case 'k':
             output = writeksh;
             break;
