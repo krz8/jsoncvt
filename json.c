@@ -167,9 +167,9 @@ earlyeof()
  *  buffers and such. Also, we could use vasprintf, instead of
  *  vsnprintf; we don't, because most implementations of *asprintf are
  *  naive about initial buffer allocations and do all sorts of malloc
- *  and reallocs under the hood. This approach sucks up a page or bso
- *  on the stack, but lets go immediately and doesn't fragment our
- *  heap further. */
+ *  and reallocs under the hood. This approach sucks up a page on the
+ *  stack, but lets go of the space immediately and doesn't fragment
+ *  our heap further. */
 static void
 ierr( const ifile *f, const char *msg, ... )
 {
@@ -282,6 +282,19 @@ readstring( ifile *f )
     return 0;
 }
 
+/** Used by readnumber(), this is passed the twine under construction
+ *  and returns the value we should return to the readnumber() caller.
+ *  It ensures that any storage accumulated in supplied twine is
+ *  returned to the system, and returns 0, which readnumber() should
+ *  chain return back to its caller, indicating a failure. Because
+ *  this is only used by readnumber(), we'll mark it static. */
+static char *
+readnumberfail( twine *tw )
+{
+    twclear( tw );
+    return 0;
+}
+
 /** We just peeked ahead and saw something that introduces a number.
  *  Gather it up into a string. The client can opt to convert this
  *  into a real number (integer or real) via jupdate() if they choose.
@@ -294,50 +307,52 @@ readnumber( ifile *f )
 {
     int c;
     twine tw = (twine){ 0 };
-    bool done = false;
-    enum floatparts { fpinteger, fpmantissa, fpexponent } fp = fpinteger;
 
-    if(( c = getch( f )) == '-' )
+    if(( c = getch( f )) == '-' )		/* sign bit */
         twaddc( &tw, c );
     else
         ungetch( f, c );
 
-    while( !done ) {
-        while( isdigit(( c = getch( f ))))
-            twaddc( &tw, c );
-
-        if( c == EOF || isspace( c ))
-            done = true;
-        else {
-            switch( fp ) {
-            case fpinteger:
-                if( c == '.' ) {
-                    fp = fpmantissa;
-                    twaddc( &tw, c );
-                } else if( c == 'e' || c == 'E' ) {
-                    fp = fpexponent;
-                    twaddc( &tw, c );
-                } else {
-                    ungetch( f, c );
-                    done = true;
-                }
-                break;
-            case fpmantissa:
-                if( c == 'e' || c == 'E' ) {
-                    fp = fpexponent;
-                    twaddc( &tw, c );
-                } else {
-                    ungetch( f, c );
-                    done = true;
-                }
-                break;
-            default:
-                ungetch( f, c );
-                done = true;
-            }
-        }
+    if(( c = getch( f )) == '0' ) {		/* integer */
+        twaddc( &tw, c );
+	c = getch( f );
+    } else if( isdigit( c ) && c != '0' ) {
+        do {
+	    twaddc( &tw, c );
+	    c = getch( f );
+	} while( isdigit( c ));
+    } else {
+        ierr( f, "unexpected '%c'", c );
+	return readnumberfail( &tw );
     }
-    return tw.len > 0 ? twfinal( &tw ) : 0;
+
+    if( c == '.' )				/* fraction */
+	do {
+	    twaddc( &tw, c );
+	    c = getch( f );
+	} while( isdigit( c ));
+
+    if( c == 'e' || c == 'E' ) {		/* exponent */
+	twaddc( &tw, c );
+	c = getch( f );
+	if( c == '+' || c == '-' ) {
+	    twaddc( &tw, c );
+	    c = getch( f );
+	}
+	while( isdigit( c )) {
+	    twaddc( &tw, c );
+	    c = getch( f );
+	}
+    }
+
+    if( c == ',' || c == ']' || c == '}' )	/* acceptable term */
+	ungetch( f, c );
+    else if( c != EOF && !isspace( c )) {	/* unacceptable */
+        ierr( f, "unexpected '%c'", c );
+	return readnumberfail( &tw );
+    }
+
+    return twfinal( &tw );
 }
 
 /** The next characters in the file stream \a f must match the ones
@@ -507,7 +522,7 @@ readvalue( ifile *f )
         }
         break;
     default:
-        ierr( f, "unexpected character '%c'", (char)c );
+        ierr( f, "unexpected '%c'", (char)c );
     }
 
     jdel( j );
