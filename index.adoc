@@ -1,7 +1,7 @@
 Lightweight JSON Parsing in C
 =============================
 Bob Krzaczek <krz@cis.rit.edu>
-v1.0.7, 2014-Nov-17: “It is always the unreadable that occurs.” —Oscar Wilde
+v1.0.8, 2014-Dec-03: “What does that even mean?”
 :toc:
 :icons:
 :encoding: utf-8
