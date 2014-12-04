@@ -271,6 +271,21 @@ _____________________________________________________________________
 
 link:jsoncvt-{revnumber}.tar.xz[]
 
+== Changelog ==
+
+1.0.8::
+	Fixed a bug; empty objects are working again.
+1.0.7::
+	Added -A flag to use associative arrays instead of compound
+	variables for ksh output.  This allows the full range of
+	name strings in JSON objects to be used.
+1.0.6::
+	Feedback from
+	https://plus.google.com/116076503327125178984[Robert Reay] and
+	https://plus.google.com/105405896645259985443[Jukka Inkeri]
+	_gratefully_ acknowledged:  tightened up the parser, and added
+	note to the documentation about compiling for C99.
+
 == Miscellaneous ==
 
 [verse, with apologies to Cracker]
