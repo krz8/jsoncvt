@@ -33,9 +33,9 @@ ptrvec *
 pvclear( ptrvec *pv )
 {
     if( !pv )
-        return 0;
+	return 0;
     if( pv->p )
-        free( pv->p );
+	free( pv->p );
     *pv = (ptrvec){ 0 };
     return pv;
 }
@@ -50,12 +50,15 @@ pvdup( const ptrvec *pv )
     void **v;
 
     if( !pv ) {
-        v = emalloc( sizeof( *v ));
-        *v = 0;
+	v = emalloc( sizeof( *v ));
+	*v = 0;
     } else {
-        size_t nb = sizeof( void* ) * ( pv->len + 1 );
-        v = emalloc( nb );
-        memcpy( v, pv->p, nb );
+	size_t nb = sizeof( void* ) * ( pv->len + 1 );
+	v = emalloc( nb );
+	if( pv->p )
+	    memcpy( v, pv->p, nb );
+	else
+	    memset( v, 0, nb );
     }
 
     return v;
@@ -80,7 +83,7 @@ void
 pvdel( ptrvec *pv )
 {
     if( pv )
-        free( pvclear( pv ));
+	free( pvclear( pv ));
 }
 
 /** Force the supplied ptrvec to contain exactly some number of
@@ -89,12 +92,12 @@ ptrvec *
 pvsize( ptrvec *pv, size_t sz )
 {
     if( !sz )
-        return pvclear( pv );
+	return pvclear( pv );
 
     pv->p = erealloc( pv->p, ( pv->sz = sz ) * sizeof( *pv->p ));
     if( pv->len >= pv->sz ) {
-        pv->len = pv->sz - 1;
-        pv->p[ pv->len ] = 0;
+	pv->len = pv->sz - 1;
+	pv->p[ pv->len ] = 0;
     }
     return pv;
 }
@@ -109,11 +112,11 @@ pvensure( ptrvec *pv, size_t sz )
     size_t newsz;
     
     if( !pv )
-        return 0;
+	return 0;
     else if( !sz || sz <= pv->sz )
-        return pv;
+	return pv;
     else if( !pv->sz && sz <= pv_initial_size )
-        return pvsize( pv, pv_initial_size );
+	return pvsize( pv, pv_initial_size );
 
     /* Choose the next size up for this ptrvec as either 150% of its
        current size, or if that's not big enough, 150% of the
@@ -121,12 +124,12 @@ pvensure( ptrvec *pv, size_t sz )
        we hopefully don't come back here too soon. */
     newsz = pv->sz * 3 / 2;
     if( newsz < sz )
-        newsz = sz * 3 / 2;
+	newsz = sz * 3 / 2;
 
     /* Imperfect, but should catch most overflows, when newsz has
        rolled past SIZE_MAX. */
     if( newsz < pv->sz )
-        die( 1, "ptrvec overflow" );
+	die( 1, "ptrvec overflow" );
 
     return pvsize( pv, newsz );
 }
