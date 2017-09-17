@@ -1,0 +1,226 @@
+'\" t
+.\"     Title: jsoncvt
+.\"    Author: Bob Krzaczek <krz@cis.rit.edu>
+.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
+.\"      Date: 2014-Jul-14
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "JSONCVT" "1" "2014\-Jul\-14" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+jsoncvt \- convert JSON to native language representations
+.SH "SYNOPSIS"
+.sp
+jsoncvt [\-Akx] [label]
+.SH "DESCRIPTION"
+.sp
+\fBjsoncvt\fR reads JSON formatted data from its standard input, and prints it back out in a native represetnation for various languages on the standard output stream\&. It is mostly meant for dynamic languages that can evaluate new values on the fly, but do not already have a JSON parser built into them\&.
+.sp
+If the \fBlabel\fR argument is supplied, it becomes the name of the toplevel value in the tree of parsed JSON data\&. Some languages do not require this (XML)\&. Other languages (ksh), which must bind their values to a variable, do require some kind of name to label data\&. When not supplied, the metaword \fBfoobar\fR is used by default\&.
+.sp
+UTF\-8 JSON input is assumed\&. Both the \fBksh93\fR and \fBXML\fR output formats support it and use the appropriate mechanisms\&.
+.SH "OPTIONS"
+.PP
+\fB\-A\fR
+.RS 4
+When converting to
+\fBksh93\fR
+format, JSON objects are reprented as associative arrays, instead of compound variables\&. This is especially useful when object key strings containing characters outside the usual characters used in variable names are present\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+Converts the parsed JSON data into
+\fBksh93\fR
+text\&.
+.RE
+.PP
+\fB\-x\fR
+.RS 4
+Converts the parsed JSON data into a compact
+\fBXML\fR
+format\&. This might be useful when you have an XML parser but no JSON parser\&.
+.RE
+.SH "FORMATS"
+.sp
+Refer to the following JSON stream when considering the formats below\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+{
+    "first" : "Bob",
+    "last" : "Krzaczek",
+    "email" : "Robert\&.Krzaczek@gmail\&.com",
+    "lucky" : 13,
+    "quarter" : 0\&.25,
+    "empty" : null,
+    "nerd" : true,
+    "lotto" : [ 9, 12, 17, 38, 45, 46 ]
+}
+.fi
+.if n \{\
+.RE
+.\}
+.SS "ksh93"
+.sp
+This output format uses features in a recent version of ksh93, supporting compound variables and typed arrays\&. Its output is meant to be fed to an \fBeval\fR statement, and assumes standard aliases and setting for variables such as \fBIFS\fR are in place\&.
+.sp
+The JSON above is rendered in the following format:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+compound foobar=(
+  first=$\*(AqBob\*(Aq
+  last=$\*(AqKrzaczek\*(Aq
+  email=$\*(AqRobert\&.Krzaczek@gmail\&.com\*(Aq
+  integer lucky=13
+  float quarter=0\&.25
+  empty=
+  bool nerd=true
+  integer \-a lotto=(
+    9
+    12
+    17
+    38
+    45
+    46
+  )
+)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+When the \fB\-A\fR flag is in effect, the output becomes:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+typeset \-A foobar=(
+  [first]=$\*(AqBob\*(Aq
+  [last]=$\*(AqKrzaczek\*(Aq
+  [email]=$\*(AqRobert\&.Krzaczek@gmail\&.com\*(Aq
+  [lucky]=13
+  [quarter]=0\&.25
+  [empty]=
+  [nerd]=true
+  [lotto]=(
+    9
+    12
+    17
+    38
+    45
+    46
+  )
+)
+.fi
+.if n \{\
+.RE
+.\}
+.SS "XML"
+.sp
+This output format is a fairly minimal use of XML, but represents the most natural translation of data that\(cqs already limited to JSON constructs\&. The result wouldn\(cqt be hard to parse with either SAX or DOM approaches\&.
+.sp
+The following grammar allows more than just an array or object at the top level of the data; in that way, it is something of a superset of JSON\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+<!ELEMENT jsoncvt (array|object|string|number|null|true|false)>
+<!ELEMENT array (array|object|string|number|null|true|false)*>
+<!ATTLIST array name CDATA #IMPLIED>
+<!ELEMENT object (array|object|string|number|null|true|false)*>
+<!ATTLIST object name CDATA #IMPLIED>
+<!ELEMENT number (#PCDATA)>
+<!ATTLIST number name CDATA #IMPLIED>
+<!ELEMENT string (#PCDATA)>
+<!ATTLIST string name CDATA #IMPLIED>
+<!ELEMENT null EMPTY>
+<!ATTLIST null name CDATA #IMPLIED>
+<!ELEMENT true EMPTY>
+<!ATTLIST true name CDATA #IMPLIED>
+<!ELEMENT false EMPTY>
+<!ATTLIST false name CDATA #IMPLIED>
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Converting the JSON example above yields:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+<?xml version=\*(Aq1\&.0\*(Aq encoding=\*(Aqutf\-8\*(Aq ?>
+<data>
+  <object name=\*(Aqfoobar\*(Aq>
+  <string name=\*(Aqfirst\*(Aq>Bob</string>
+  <string name=\*(Aqlast\*(Aq>Krzaczek</string>
+  <string name=\*(Aqemail\*(Aq>Robert\&.Krzaczek@gmail\&.com</string>
+  <number name=\*(Aqlucky\*(Aq>13</number>
+  <number name=\*(Aqquarter\*(Aq>0\&.25</number>
+  <null name=\*(Aqempty\*(Aq />
+  <true name=\*(Aqnerd\*(Aq />
+  <array name=\*(Aqlotto\*(Aq>
+    <number>9</number>
+    <number>12</number>
+    <number>17</number>
+    <number>38</number>
+    <number>45</number>
+    <number>46</number>
+  </array>
+  </object>
+</data>
+.fi
+.if n \{\
+.RE
+.\}
+.SH "STATUS"
+.PP
+\fB0\fR
+.RS 4
+Success\&. The JSON file contains no errors, was successfully parsed, and the selected output format was generated\&.
+.RE
+.PP
+\fB1\fR
+.RS 4
+Failure\&. There was either a problem in the JSON data provided, or some aspect of that data could not be represented in the selected format\&.
+.RE
+.PP
+\fB2\fR
+.RS 4
+Failure\&. There was a problem with the options or arguments provided on the command line\&.
+.RE
+.SH "AUTHOR"
+.PP
+\fBBob Krzaczek\fR <\&krz@cis\&.rit\&.edu\&>
+.RS 4
+Author.
+.RE

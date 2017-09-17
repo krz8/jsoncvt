@@ -1,0 +1,71 @@
+#!/usr/bin/env ksh
+
+make docs || exit 1
+
+if	! git status -uno --porcelain |wc -l |read lines
+then	print "cannot get repo status?"
+	exit 1
+elif	(( lines > 0 ))
+then	print "index or working tree is not clean"
+	exit 1
+fi
+
+if	! git symbolic-ref --short HEAD |read branch
+then	print "cannot release on detached head"
+	exit 1
+elif	[[ $branch != master ]]
+then	print "will not release from a branch other than master"
+	exit 1
+fi
+
+if	! sed -n -e 5q -e '4s/,.*//p' index.adoc |read version
+then	print "cannot find version on line 4 of index.adoc"
+	exit 1
+elif	[[ -z $version ]]
+then	print "cannot find version on line 4 of index.adoc"
+	exit 1
+fi
+
+version=${version#v}
+print "releasing version $version"
+
+if	! grep "//DTD jsoncvt $version//" xml.c >/dev/null 2>&1
+then	print "xml.c DTD version is out of date"
+	exit 1
+fi
+
+if	[[ $version != "$(git tag -l "$version")" ]]
+then	print "is $version tagged?"
+	exit 1
+fi
+
+outfile=jsoncvt-${version}.tar.xz
+if	[[ -e $outfile ]]
+then	print "looks like $version was already released"
+	exit 1
+fi
+
+if	! git archive "--prefix=jsoncvt-$version/" --worktree-attributes \
+		-o "jsoncvt-$version.tar" \
+		"$version"
+then	print "cannot create release archive"
+	exit 1
+fi
+
+if	! xz -9ev "jsoncvt-$version.tar"
+then	print "cannot compress archive"
+	exit 1
+fi
+
+if	! cp {index,jsoncvt,jsonh}.html jsoncvt.{1,dtd} "jsoncvt-$version.tar.xz" \
+		"$HOME/public_html/hacks/jsoncvt/"
+then	print "cannot copy to local www directory"
+	exit 1
+fi
+
+if	! ( cd $HOME; rsync -avz public_html/ saturn:public_html/ )
+then	print "cannot sync local www to server"
+	exit 1
+fi
+
+exit 0
